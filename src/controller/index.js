@@ -12,16 +12,21 @@ const SALT_WORK_FACTOR = 12;
  */
 exports.login = async (req, res) => {
     const { userName, password } = req.body;
-    if (!userName) throw new Error('Username is required');
-    if (!password) throw new Error('password is required');
+    if (!userName) res.status(400).send('Username is required');
+    if (!password) res.status(400).send('password is required');
 
     const user = await userService.findOne({userName: userName});
-    if (!user) throw new errors.BadRequestError('The username does not exist, please sign up for a new account');
+    if (!user) res.status(404).send('The username does not exist, please sign up for a new account');
 
     const authUser = await userService.findOne({userId: user.userId})
 
-    await comparePassword(authUser, password)
-    res.status(200).json({token: authUser.token, expires: ''});
+    const passCheck = await comparePassword(authUser, password);
+
+    if (passCheck) {
+        res.status(200).json({token: authUser.token, expires: ''})
+    } else {
+        res.status(404).send('Username or Password does not match, Please check again')
+    }
 }
 
 /**
@@ -29,10 +34,10 @@ exports.login = async (req, res) => {
  */
 exports.signup = async (req, res) => {
     const { userName, password, email, phoneNumber } = req.body;
-    if (!userName) throw new Error('Username is required');
-    if (!password) throw new Error('Password is required');
-    if (!email) throw new Error('Email is required');
-    if (!phoneNumber) throw new Error('Phone number is required');
+    if (!userName) res.status(400).send('Username is required');
+    if (!password) res.status(400).send('Password is required');
+    if (!email) res.status(400).send('Email is required');
+    if (!phoneNumber) res.status(400).send('Phone number is required');
 
     const [hash, token, sanitizedEmail] = await Promise.all([hashPassword(password), generateAuthToken(), sanitizeEmail(email)])
 
@@ -90,6 +95,7 @@ async function comparePassword(auth, input) {
     const output = sanitizePassword(input)
     const match = await bcrypt.compare(output, auth.password)
     if (!match) {
-    throw new Error('Password does not match')
+    return false;
     }
+    return true;
 }

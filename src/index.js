@@ -20,13 +20,9 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello World')
 })
 
-app.post('/signup', signup, (req, res) => {
-  res.status(201).send('user created')
-})
+app.post('/signup', signup);
 
-app.post('/login', login, (req, res) => {
-  res.status(200).send('user logged in')
-})
+app.post('/login', login)
 
 app.listen(port, () => {
   console.log(`Server started on ${port}`)
