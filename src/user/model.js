@@ -71,6 +71,9 @@ class CommonModel {
       type: String,
       required: true,
       trim: true
+    },
+    otp: {
+      type: String,
     }
   }
   }
