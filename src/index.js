@@ -4,7 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser')
 
 const mongodb = require('./DB/mongodb.js');
-const {login, signup} = require('../src/controller/index')
+const {login, signup, validate} = require('../src/controller/index')
 
 const port = 5000;
 
@@ -22,7 +22,9 @@ app.get('/', (req, res) => {
 
 app.post('/signup', signup);
 
-app.post('/login', login)
+app.post('/login', login);
+
+app.post('/validate', validate)
 
 app.listen(port, () => {
   console.log(`Server started on ${port}`)
