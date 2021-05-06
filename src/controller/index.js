@@ -7,25 +7,32 @@ const MIN_PASSWORD_LENGTH = 6;
 const MAX_PASSWORD_LENGTH = 32;
 const SALT_WORK_FACTOR = 12;
 
+// one time password creds
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
+
 /**
  * @method login
  */
 exports.login = async (req, res) => {
     const { userName, password } = req.body;
-    if (!userName) res.status(400).send('Username is required');
-    if (!password) res.status(400).send('password is required');
+    if (!userName) return res.status(400).send('Username is required');
+    if (!password) return res.status(400).send('password is required');
 
     const user = await userService.findOne({userName: userName});
-    if (!user) res.status(404).send('The username does not exist, please sign up for a new account');
+    if (!user) return res.status(404).send('The username does not exist, please sign up for a new account');
 
     const authUser = await userService.findOne({userId: user.userId})
+
+    if (!authUser.accountVerified) return res.status(404).send('Please check your phone to verify account before proceeding')
 
     const passCheck = await comparePassword(authUser, password);
 
     if (passCheck) {
-        res.status(200).json({token: authUser.token, expires: ''})
+        return res.status(200).json({token: authUser.token, expires: ''})
     } else {
-        res.status(404).send('Username or Password does not match, Please check again')
+        return res.status(404).send('Username or Password does not match, Please check again')
     }
 }
 
@@ -34,33 +41,61 @@ exports.login = async (req, res) => {
  */
 exports.signup = async (req, res) => {
     const { userName, password, email, phoneNumber } = req.body;
-    if (!userName) res.status(400).send('Username is required');
-    if (!password) res.status(400).send('Password is required');
-    if (!email) res.status(400).send('Email is required');
-    if (!phoneNumber) res.status(400).send('Phone number is required');
+    if (!userName) return res.status(400).send('Username is required');
+    if (!password) return res.status(400).send('Password is required');
+    if (!email) return res.status(400).send('Email is required');
+    if (!phoneNumber) return res.status(400).send('Phone number is required');
 
     const [hash, token, sanitizedEmail] = await Promise.all([hashPassword(password), generateAuthToken(), sanitizeEmail(email)])
-
+    const randomHex  = await utils.randomHex(6);
+    // create user
     const auth = await userService.create({
         userName: userName,
         password: hash,
         email: sanitizedEmail,
         phoneNumber: phoneNumber,
-        token: token
+        token: token,
+        otp: randomHex
     });
 
-    // send one time password to email and password
-    res.status(201).send({auth});
+    const username = auth.userName;
+    const otp = auth.otp;
+    const mail = auth.email;
+    const phone = auth.phoneNumber;
+
+    // send user verification code. 
+    client.messages
+        .create({
+        body: `Please verify your new Halen account with this code: ${randomHex}`,
+        from: "+17472290054",
+        to: `+1${phoneNumber}`
+  })
+  .then((message) => console.log(message.sid));
+
+    // send user data back
+    return res.status(201).send({username, password, mail, phone});
 }
 
 /**
  * @method validate phone number
  */
-validate = async (req, res) => {
-    const user = req.body;
-    // generate random one time password and send to email or phone
+exports.validate = async (req, res) => {
+    const { userName, otp } = req.body;
+    if (!userName) return res.status(400).send('Username is required');
+    if (!otp) return res.status(400).send('One time passcode is required to verify account');
 
-    // on successful response, 
+    // check username
+    const user = await userService.findOne({userName: userName});
+    if (!user) return res.status(404).send('Username not found. Please check and try again');
+
+    // check otp
+    if (user.otp !== otp) {
+        return res.status(400).send('Passcode does not match, please try again')
+    } else {
+        await userService.findOneAndUpdate({userName: userName},{accountVerified: true} )
+    }
+
+    return res.status(200).send('Your account is successfully confirmed!')
 }
 
 
