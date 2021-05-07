@@ -72,7 +72,7 @@ exports.signup = async (req, res) => {
   })
   .then((message) => console.log(message.sid));
 
-    // send user data back
+//     send user data back
     return res.status(201).send({username, password, mail, phone});
 }
 
@@ -95,7 +95,7 @@ exports.validate = async (req, res) => {
         await userService.findOneAndUpdate({userName: userName},{accountVerified: true} )
     }
 
-    return res.status(200).send('Your account is successfully confirmed!')
+    return res.status(200).send('Your account is successfully confirmed! Proceed to login')
 }
 
 
