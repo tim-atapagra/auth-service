@@ -71,6 +71,7 @@ exports.signup = async (req, res) => {
   });
 
   const username = auth.userName;
+  const userId = auth.userId;
   const mail = auth.email;
   const phone = auth.phoneNumber;
 
@@ -84,7 +85,7 @@ exports.signup = async (req, res) => {
     .then(message => console.log(message.sid));
 
   //     send user data back
-  return res.status(201).send({ username, password, mail, phone });
+  return res.status(201).send({ userId, username, password, mail, phone });
 };
 
 /**
