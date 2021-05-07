@@ -24,16 +24,9 @@ class MongoDB {
 
   get connnectionOptions() {
     return {
-      ssl: process.env.MONGODB_SSL === 'true',
-      poolSize: 1,
-      readPreference: ReadPreference.PRIMARY_PREFERRED,
-      keepAlive: 1000,
-      connectTimeoutMS: 360000,
-      socketTimeoutMS: 360000,
-      validateOptions: true,
       useNewUrlParser: true,
-      promiseLibrary: Promise,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      useCreateIndex: true
     }
   }
 
