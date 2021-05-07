@@ -67,7 +67,7 @@ exports.signup = async (req, res) => {
     email: sanitizedEmail,
     phoneNumber: phoneNumber,
     token: token,
-    otp: randomHex
+    otpCode: randomHex
   });
 
   const username = auth.userName;
@@ -92,9 +92,9 @@ exports.signup = async (req, res) => {
  * @method validate phone number
  */
 exports.validate = async (req, res) => {
-  const { userName, otp } = req.body;
+  const { userName, otpCode } = req.body;
   if (!userName) return res.status(400).send("Username is required");
-  if (!otp)
+  if (!otpCode)
     return res
       .status(400)
       .send("One time passcode is required to verify account");
@@ -106,8 +106,8 @@ exports.validate = async (req, res) => {
       .status(404)
       .send("Username not found. Please check and try again");
 
-  // check otp
-  if (user.otp !== otp) {
+  // check otpCode
+  if (user.otpCode !== otpCode) {
     return res.status(400).send("Passcode does not match, please try again");
   } else {
     await userService.findOneAndUpdate(

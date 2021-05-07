@@ -72,7 +72,7 @@ class CommonModel {
         required: true,
         trim: true
       },
-      otp: {
+      otpCode: {
         type: String
       }
     };
