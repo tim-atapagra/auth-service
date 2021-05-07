@@ -1,33 +1,30 @@
-require('dotenv').config()
+require("dotenv").config();
 
-const express = require('express');
-const bodyParser = require('body-parser')
+const express = require("express");
 
-const mongodb = require('./DB/mongodb.js');
-const {login, signup, validate} = require('../src/controller/index')
+const mongodb = require("./DB/mongodb.js");
+const { login, signup, validate } = require("../src/controller/index");
 
 const port = 5000;
 
 const app = express();
 
+app.use(express.json());
 
-app.use(express.json())
+mongodb.connect();
 
-mongodb.connect()
+app.get("/", (req, res) => {
+  res.status(200).send("Hello World");
+});
 
+app.post("/signup", signup);
 
-app.get('/', (req, res) => {
-  res.status(200).send('Hello World')
-})
+app.post("/login", login);
 
-app.post('/signup', signup);
-
-app.post('/login', login);
-
-app.post('/validate', validate)
+app.post("/validate", validate);
 
 app.listen(port, () => {
-  console.log(`Server started on ${port}`)
-})
+  console.log(`Server started on ${port}`);
+});
 
 module.exports = app;

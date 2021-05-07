@@ -1,10 +1,9 @@
-const { MongoClient, ReadPreference } = require('mongodb')
-const mongoose = require('mongoose')
+const { MongoClient } = require("mongodb");
+const mongoose = require("mongoose");
 
-mongoose.set('useCreateIndex', true)
-mongoose.set('useNewUrlParser', true)
-mongoose.set('useFindAndModify', false)
-
+mongoose.set("useCreateIndex", true);
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
 
 /**
  * @class MongoDB
@@ -14,20 +13,19 @@ class MongoDB {
    * @param {MongooseSchema} Schema
    */
   get Schema() {
-    return mongoose.Schema
+    return mongoose.Schema;
   }
 
   get connectionUri() {
-    return process.env.MONGODB_URI || 'mongodb://localhost:27017'
+    return process.env.MONGODB_URI || "mongodb://localhost:27017";
   }
-
 
   get connnectionOptions() {
     return {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true
-    }
+    };
   }
 
   /**
@@ -37,25 +35,25 @@ class MongoDB {
   connect() {
     return new Promise((resolve, reject) => {
       if (this.readyState > 0) {
-        const error = new Error('MongoDB - already connecting/connected')
-        return reject(error)
+        const error = new Error("MongoDB - already connecting/connected");
+        return reject(error);
       }
 
       mongoose.connect(this.connectionUri, {
         ...this.connnectionOptions,
         dbName: this.connectionDb
-      })
+      });
 
-      mongoose.connection.once('open', () => {
-        console.log('MongoDB: connected')
-        resolve()
-      })
+      mongoose.connection.once("open", () => {
+        console.log("MongoDB: connected");
+        resolve();
+      });
 
-      mongoose.connection.on('error', err => {
-        console.error('MongoDB: error', err)
-        reject(err)
-      })
-    })
+      mongoose.connection.on("error", err => {
+        console.error("MongoDB: error", err);
+        reject(err);
+      });
+    });
   }
 
   /**
@@ -63,7 +61,7 @@ class MongoDB {
    * @return {Promise}
    */
   async disconnect() {
-    return mongoose.connection.close()
+    return mongoose.connection.close();
   }
 
   /**
@@ -71,21 +69,24 @@ class MongoDB {
    * @return {MongooseModel}
    */
   createModel() {
-    return mongoose.model(...arguments)
+    return mongoose.model(...arguments);
   }
 
   /**
    * @method createModel
    * @return {Promise}
    */
-  async createConnection(uri = this.connectionUri, options = this.connnectionOptions) {
-    const client = new MongoClient(uri, options)
-    await client.connect()
+  async createConnection(
+    uri = this.connectionUri,
+    options = this.connnectionOptions
+  ) {
+    const client = new MongoClient(uri, options);
+    await client.connect();
     return {
       client,
       db: client.db(options.dbName)
-    }
+    };
   }
 }
 
-module.exports = new MongoDB()
+module.exports = new MongoDB();
