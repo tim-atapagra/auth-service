@@ -2,7 +2,7 @@
 
 ### To start application
 
-1. Create an empty env file and provide the creds you received from me
+1. Clone and create an empty env file in the root of application. Provide the creds you received from me
 
 2. Run
 
@@ -12,9 +12,9 @@ Then run
 
 `npm start`
 
-3. The following endpoints are exposed: signup, validate and login.
+3. Head to Postman or any api testing tool you use. The following endpoints are exposed: signup, validate and login.
 
-4. Sign up for an account with an example body like so:
+4. Sign up for an account with the `/signup` endpoint and example body like so:
 ` 
   {
     "username";: "test",
@@ -24,7 +24,7 @@ Then run
   }
 `
 
-5. After signup, use the validate endpoint to authenticate your account with a code that'll be sent to the phone number you provided.
+5. After signup, use the `/validate` endpoint to authenticate your account with a code that'll be sent to the phone number you provided.
 Provide the following format to the body of the validate endpoint
 
 `
@@ -34,7 +34,10 @@ Provide the following format to the body of the validate endpoint
   }
 `
 
-6. Proceed to sign in with your username and password.
+6. Proceed to sign `/signin` in with your username and password.
+
+
+7. All methods are `POST` 
 
 
 
