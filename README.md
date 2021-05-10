@@ -2,7 +2,7 @@
 
 ### To start application
 
-1. Clone and create an empty env file in the root of application. Provide the creds you received from me
+1. Clone and create an empty `.env` file in the root of application. Provide the creds you received from me
 
 2. Run
 
@@ -17,10 +17,10 @@ Then run
 4. Sign up for an account with the `/signup` endpoint and example body like so:
 ` 
   {
-    "username";: "test",
+    "userName";: "test",
     "password";: "test@test.com",
     "email": "test@test.com",
-    "phonenumber": "+10000000000"
+    "phoneNumber": "1234567890"
   }
 `
 
@@ -29,7 +29,7 @@ Provide the following format to the body of the validate endpoint
 
 `
   {
-    "username": "test",
+    "userName": "test",
     "otpCode": "12345";
   }
 `
